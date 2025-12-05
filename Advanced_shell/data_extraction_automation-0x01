@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#extracting fields using jq
+name=$(jq -r '.name' data.json)
+height=$(jq -r '.height' data.json)
+weight=$(jq -r '.weight' data.json)
+type=$(jq -r '.types[0].type.name' data.json)
+
+
+#converting height to meters, weight to kilograms
+height_m=$(echo "$height /10" | bc -l)
+weight_m=$(echo "$weight /10" | bc -l)
+
+echo "$(echo $name | sed 's/.*/\u&/') is of type $(echo $type | sed 's/.*/\u&/'), weighs ${weight_kg}kg, and is ${height_m}m tall."
