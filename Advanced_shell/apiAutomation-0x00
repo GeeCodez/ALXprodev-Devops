@@ -1,0 +1,14 @@
+#!/bin/bash
+#API URL 
+URL="https://pokeapi.co/api/v2/pokemon/pikachu"
+
+#making the request and saving the result to data.json
+response=$(curl -s -w "%{http_code}" -o data.json "$URL")
+
+#checking if the request was successful (status code 200)
+if [ "$response" -eq 200 ]; then
+    echo "Data retreived and saved to data.json"
+else
+    echo "$(date): Failed to fetch data. Status code: $response ">>error.txt
+    echo "Request failed. Check errors.txt"
+fi
