@@ -2,7 +2,7 @@
 
 # List of Pokémon
 pokemons=("Bulbasaur" "Ivysaur" "Venusaur" "Charmander" "Charmeleon")
-
+kill
 # Function to fetch Pokémon data
 fetch_pokemon() {
     local p="$1"
