@@ -1,5 +1,7 @@
 #!/bin/bash
 
+pokeman=["bulbasaur", "ivysaur", "venusaur", "charmander", "charmeleon"]
+
 # Loop through Pokémon with quoted names
 for p in "Bulbasaur" "Ivysaur" "Venusaur" "Charmander" "Charmeleon"; do
     filename=$(echo "$p" | tr '[:upper:]' '[:lower:]').json
