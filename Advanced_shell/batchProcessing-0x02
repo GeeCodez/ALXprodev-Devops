@@ -7,15 +7,29 @@ for p in "Bulbasaur" "Ivysaur" "Venusaur" "Charmander" "Charmeleon"; do
     filename=$(echo "$p" | tr '[:upper:]' '[:lower:]').json
     url="https://pokeapi.co/api/v2/pokemon/$(echo "$p" | tr '[:upper:]' '[:lower:]')"
 
-    response=$(curl -s -w "%{http_code}" -o "$filename" "$url")
+    max_retries=3
+    attempt=1
+    success=0
 
-    if [ "$response" -eq 200 ]; then
-        echo "Saved $p data to $filename"
-    else
-        echo "$(date): Failed to fetch $p. Status code: $response" >> errors.txt
-        rm -f "$filename"
+    while [ $attempt -le $max_retries ]; do
+        response=$(curl -s -w "%{http_code}" -o "$filename" "$url")
+
+        if [ "$response" -eq 200 ]; then
+            echo "Saved $p data to $filename"
+            success=1
+            break
+        else
+            echo "Attempt $attempt for $p failed. Status code: $response"
+            ((attempt++))
+            sleep 1
+        fi
+    done
+
+    if [ $success -eq 0 ]; then
+        echo "$(date): Failed to fetch $p after $max_retries attempts" >> errors.txt
+        rm -f "$filename"  # remove incomplete file
     fi
 
-    # Delay to prevent API rate-limiting
+    # Delay between Pokémon to avoid rate-limiting
     sleep 1
 done
