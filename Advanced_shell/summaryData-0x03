@@ -1,24 +1,28 @@
-#6!/bin/bash
+#!/bin/bash
 
-csv_file="pokeman_report.csv"
+# Output CSV file
+csv_file="pokemon_report.csv"
 
-#writing csv header
+# Write CSV header
 echo "Name,Height,Weight" > "$csv_file"
-for file in *.json; do 
-    #extracting name,heigh, and weight using jq
-    name=$(jq -r '.name' "$file")
-    height=$(jq -r '.height' "$file")
-    weight=$(jq -r '.weight' "$file")
 
-    #converting the weight and the height to the human readable form 
-    formatted_height=$(echo "$height" | awk '{printf "%.1f", $1/10}')
-    formatted_weight=$(echo "$weight" | awk '{printf "%.0f", $1/10}')
+# Loop through all JSON files
+for file in *.json; do
+    # Extract name, height, weight using jq
+    name=$(jq -r '.name' "$file" | sed 's/.*/\u&/')   # capitalize first letter
+    height=$(jq '.height' "$file")
+    weight=$(jq '.weight' "$file")
 
-    #appending to csv
-    echo "$name, $formatted_height, $formatted_weight" >> "$csv_file"
+    # Convert height/weight to meters/kg
+    height_m=$(echo "$height / 10" | bc -l)
+    weight_kg=$(echo "$weight / 10" | bc -l)
+
+    # Append to CSV
+    echo "$name,$height_m,$weight_kg" >> "$csv_file"
 done
 
-#calculating the average using awk
+# Calculate averages using awk
 awk -F',' '
-NR>1 {sum_h+=$2; sum_w+=$3; count++}
-END {printf "Average Height: %.2fm\nAverage Weight:%.2fkg\n", sum_h/count, sum_w/count}' "$csv_file"
+NR>1 {sum_h+=$2; sum_w+=$3; count++} 
+END {printf "Average Height: %.2fm\nAverage Weight: %.2fkg\n", sum_h/count, sum_w/count}
+' "$csv_file"
