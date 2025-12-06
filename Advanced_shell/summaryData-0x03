@@ -1,0 +1,24 @@
+#6!/bin/bash
+
+csv_file="pokeman_report.csv"
+
+#writing csv header
+echo "Name,Height,Weight" > "$csv_file"
+for file in *.json; do 
+    #extracting name,heigh, and weight using jq
+    name=$(jq -r '.name' "$file")
+    height=$(jq -r '.height' "$file")
+    weight=$(jq -r '.weight' "$file")
+
+    #converting the weight and the height to the human readable form 
+    formatted_height=$(echo "$height" | awk '{printf "%.1f", $1/10}')
+    formatted_weight=$(echo "$weight" | awk '{printf "%.0f", $1/10}')
+
+    #appending to csv
+    echo "$name, $formatted_height, $formatted_weight" >> "$csv_file"
+done
+
+#calculating the average using awk
+awk -F',' '
+NR>1 {sum_h+=$2; sum_w+=$3; count++}
+END {printf "Average Height: %.2fm\nAverage Weight:%.2fkg\n", sum_h/count, sum_w/count}' "$csv_file"
